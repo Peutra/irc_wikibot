@@ -7,17 +7,21 @@ require "socket"
 $SAFE=1
 # The irc class, which talks to the server and holds the main event loop
 class IRC
-  def initialize(server, port, wiki_bot, channel)
+  def initialize(server, port, nickname, channel)
     @server = server
     @port = port
-    @wiki_bot = wiki_bot
+    @nickname = nickname
     @channel = channel
   end
   #connect to the IRC server
   def connect()
     @irc = TCPSocket.open(@server, @port)
-    send "USER blablablabla :bla bla"
-    send "BOT #{@wiki_bot} JOIN #{@channel}"
+    print("addr: ", @irc.addr.join(":"), "\n")
+    print("peer: ", @irc.peeraddr.join(":"), "\n")
+    @irc.puts "USER testing 0 * Testing"
+    @irc.puts "NICK FUCKOFFFFF #{@nickname}"
+    @irc.puts "JOIN #{@channel}"
+    @irc.puts "PRIVMSG #{@channel} :Hello from IRB Bot"
   end
   # Make sure we have a valid expression for security reasons if ok ok, if not ok error"
   def evaluate(s)

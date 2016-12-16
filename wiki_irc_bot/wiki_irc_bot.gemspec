@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.description = "roject made @ Code & Go"
   s.authors     = ["Peutra"]
   s.email       = 'peutra@gmail.com'
-  s.files       = ["lib/wiki_irc_bot.rb", "lib/interaction/welcome.rb", "lib/bot/wiki_irc_bot.rb"]
+  s.files       = ["lib/wiki_irc_bot.rb", "lib/interaction/welcome.rb", "lib/bot/irc_bot.rb"]
   s.executables << 'wiki_irc_bot'
   s.homepage    =
     'http://rubygems.org/gems/wiki_irc_bot'
