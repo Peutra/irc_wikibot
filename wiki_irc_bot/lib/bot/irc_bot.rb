@@ -18,22 +18,37 @@ class IRC
     @irc = TCPSocket.open(@server, @port)
     print("addr: ", @irc.addr.join(":"), "\n")
     print("peer: ", @irc.peeraddr.join(":"), "\n")
-    @irc.puts "USER testing 0 * Testing"
-    @irc.puts "NICK FUCKOFFFFF #{@nickname}"
+    @irc.puts "NICK #{@nickname}"
     @irc.puts "JOIN #{@channel}"
-    @irc.puts "PRIVMSG #{@channel} :Hello from IRB Bot"
+    @irc.puts "PRIVMSG #{@channel} :Hello from wikibot"
+    @irc.puts "PRIVMSG #{@channel} :Write '@wikibot search [something]'"
   end
   # Make sure we have a valid expression for security reasons if ok ok, if not ok error"
   def evaluate(s)
     # TODOTODOTODO
   end
   def handle_server_input(s)
-    # TODOTODOTODO
+    case s.strip
+    when    /HELLO/i
+            puts "SAID HELLO"
+            send "PONG :#{$1}"
+        when /^:(.+?)!(.+?)@(.+?)\sPRIVMSG\s.+\s:[\001]PING (.+)[\001]$/i
+            puts "[ CTCP PING from #{$1}!#{$2}@#{$3} ]"
+            send "NOTICE #{$1} :\001PING #{$4}\001"
+        when /^:(.+?)!(.+?)@(.+?)\sPRIVMSG\s.+\s:[\001]VERSION[\001]$/i
+            puts "[ CTCP VERSION from #{$1}!#{$2}@#{$3} ]"
+            send "NOTICE #{$1} :\001VERSION Ruby-irc v0.042\001"
+        when /^:(.+?)!(.+?)@(.+?)\sPRIVMSG\s(.+)\s:#{@nick}: (.+)$/i
+            puts "[ EVAL #{$5} from #{$1}!#{$2}@#{$3} ]"
+            # nick, client, host, room, msg
+            send "PRIVMSG #{(($4==@nick)?$1:$4)} :#{evaluate($5)}"
+        else
+            puts s
+    end
   end
   # Send a message to the irc server and print to screen
   def send(s)
-    puts ">>> #{s}"
-    @irc.send "#{s}\n", 0
+    @irc.puts "PRIVMSG #{@channel} #{s}"
   end
   # Keeps on doing things yeah
   def main_loop()
