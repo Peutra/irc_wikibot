@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require 'wiki_irc_bot'
+WikiIrcBot.wib

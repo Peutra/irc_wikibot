@@ -1,0 +1,3 @@
+class WikiIrcBot::Search
+
+end

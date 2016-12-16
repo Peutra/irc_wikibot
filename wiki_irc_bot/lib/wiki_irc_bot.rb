@@ -1,5 +1,7 @@
 class WikiIrcBot
-  def self.hi
-    puts "Hello I'am a boooot"
+  def self.wib
+    welcome = Welcome.new
   end
 end
+
+require 'interaction/welcome'
