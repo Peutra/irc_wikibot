@@ -1,5 +1,5 @@
 class WikiIrcBot::Welcome
-  def initialize()
+  def initialize
     puts "Hello dear. Please say 'Hello bot'"
     welcome = gets.chomp
     self.polite?(welcome)

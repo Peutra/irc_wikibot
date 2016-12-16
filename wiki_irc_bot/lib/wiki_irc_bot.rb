@@ -1,6 +1,6 @@
 class WikiIrcBot
   def self.wib
-    welcome = Welcome.new
+    @welcome = Welcome.new
   end
 end
 
