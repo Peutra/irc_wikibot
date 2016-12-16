@@ -18,6 +18,7 @@ class IRC
     @irc = TCPSocket.open(@server, @port)
     print("addr: ", @irc.addr.join(":"), "\n")
     print("peer: ", @irc.peeraddr.join(":"), "\n")
+    @irc.puts "USER testing 0 * Testing"
     @irc.puts "NICK #{@nickname}"
     @irc.puts "JOIN #{@channel}"
     @irc.puts "PRIVMSG #{@channel} :Hello from wikibot"
@@ -28,9 +29,11 @@ class IRC
     # TODOTODOTODO
   end
   def handle_server_input(s)
+    # This isn't at all efficient, but it shows what we can do with Ruby
+    # (Dave Thomas calls this construct "a multiway if on steroids")
     case s.strip
-    when    /HELLO/i
-            puts "SAID HELLO"
+        when /^PING :(.+)$/i
+            puts "[ Server ping ]"
             send "PONG :#{$1}"
         when /^:(.+?)!(.+?)@(.+?)\sPRIVMSG\s.+\s:[\001]PING (.+)[\001]$/i
             puts "[ CTCP PING from #{$1}!#{$2}@#{$3} ]"
@@ -41,7 +44,7 @@ class IRC
         when /^:(.+?)!(.+?)@(.+?)\sPRIVMSG\s(.+)\s:#{@nick}: (.+)$/i
             puts "[ EVAL #{$5} from #{$1}!#{$2}@#{$3} ]"
             # nick, client, host, room, msg
-            send "PRIVMSG #{(($4==@nick)?$1:$4)} :#{evaluate($5)}"
+            send "PRIVMSG #{(($4==@nickname)?$1:$4)} :#{evaluate($5)}"
         else
             puts s
     end
