@@ -22,36 +22,19 @@ class IRC
     @irc.puts "NICK #{@nickname}"
     @irc.puts "JOIN #{@channel}"
     @irc.puts "PRIVMSG #{@channel} :Hello from wikibot"
-    @irc.puts "PRIVMSG #{@channel} :Write '@wikibot search [something]'"
+    @irc.puts "PRIVMSG #{@channel} :Type '@wikibot search [something]'"
   end
   # Make sure we have a valid expression for security reasons if ok ok, if not ok error"
   def evaluate(s)
     # TODOTODOTODO
   end
   def handle_server_input(s)
-    # This isn't at all efficient, but it shows what we can do with Ruby
-    # (Dave Thomas calls this construct "a multiway if on steroids")
-    case s.strip
-        when /^PING :(.+)$/i
-            puts "[ Server ping ]"
-            send "PONG :#{$1}"
-        when /^:(.+?)!(.+?)@(.+?)\sPRIVMSG\s.+\s:[\001]PING (.+)[\001]$/i
-            puts "[ CTCP PING from #{$1}!#{$2}@#{$3} ]"
-            send "NOTICE #{$1} :\001PING #{$4}\001"
-        when /^:(.+?)!(.+?)@(.+?)\sPRIVMSG\s.+\s:[\001]VERSION[\001]$/i
-            puts "[ CTCP VERSION from #{$1}!#{$2}@#{$3} ]"
-            send "NOTICE #{$1} :\001VERSION Ruby-irc v0.042\001"
-        when /^:(.+?)!(.+?)@(.+?)\sPRIVMSG\s(.+)\s:#{@nick}: (.+)$/i
-            puts "[ EVAL #{$5} from #{$1}!#{$2}@#{$3} ]"
-            # nick, client, host, room, msg
-            send "PRIVMSG #{(($4==@nickname)?$1:$4)} :#{evaluate($5)}"
-        else
-            puts s
+    puts "#{s}"
+    if s.include? "HELLO"
+        @irc.puts "PRIVMSG #{@channel} :HELLO YOU"
+      else
+        @irc.puts "NONONO"
     end
-  end
-  # Send a message to the irc server and print to screen
-  def send(s)
-    @irc.puts "PRIVMSG #{@channel} #{s}"
   end
   # Keeps on doing things yeah
   def main_loop()
@@ -59,12 +42,14 @@ class IRC
       ready = select([@irc, $stdin], nil, nil, nil)
       next if !ready
       for s in ready[0]
-        if s == $stdin then
-          return if $stdin.eof
-          s = $stdin.gets
-          send s
-          # TODOTODO ELSE FOR HANDLING SERVER INPUTS
-        end
+          if s == $stdin then
+              return if $stdin.eof
+              s = $stdin.gets
+          elsif s == @irc then
+              return if @irc.eof
+              s = @irc.gets
+              handle_server_input(s)
+          end
       end
     end
   end
