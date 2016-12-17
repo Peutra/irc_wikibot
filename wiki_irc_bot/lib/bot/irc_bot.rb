@@ -30,10 +30,16 @@ class IRC
   end
   def handle_server_input(s)
     puts "#{s}"
-    if s.include? "HELLO"
-        @irc.puts "PRIVMSG #{@channel} :HELLO YOU"
+    if s.include? "Hello"
+        @irc.puts "PRIVMSG #{@channel} :Hello bastard"
+      elsif s.include? "@wikibot search "
+        ## GET EVERYTHING AFTER "search"
+        midsubstring = s.match(/(?<=@wikibot search).*/)[0]
+        endsubstring = midsubstring[1, midsubstring.length]
+        @irc.puts "PRIVMSG #{@channel} :Wanna search #{endsubstring} ?"
+        ## LAUNCH DA SHIT
       else
-        @irc.puts "NONONO"
+        return
     end
   end
   # Keeps on doing things yeah
