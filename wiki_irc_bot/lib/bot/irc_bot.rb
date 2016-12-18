@@ -6,7 +6,7 @@ require "socket"
 # Taint checking is a feature in some computer programming languages, such as Perl[1] and Ruby,[2] designed to increase security by preventing malicious users from executing commands on a host computer.
 $SAFE=1
 # The irc class, which talks to the server and holds the main event loop
-class IRC
+class WikiIrcBot::IRC
   def initialize(server, port, nickname, channel)
     @server = server
     @port = port
@@ -36,8 +36,15 @@ class IRC
         ## GET EVERYTHING AFTER "search"
         midsubstring = s.match(/(?<=@wikibot search).*/)[0]
         endsubstring = midsubstring[1, midsubstring.length]
-        @irc.puts "PRIVMSG #{@channel} :Wanna search #{endsubstring} ?"
         ## LAUNCH DA SHIT
+        result = WikiIrcBot::Search.new.returnResults(endsubstring)
+        result.each_with_index do | (key, value), index |
+          if index < 9
+            @irc.puts "PRIVMSG #{@channel} :#{index + 1}    | #{key} => #{value}"
+          else
+            @irc.puts "PRIVMSG #{@channel} :#{index + 1}   | #{key} => #{value}"
+          end
+        end
       else
         return
     end
